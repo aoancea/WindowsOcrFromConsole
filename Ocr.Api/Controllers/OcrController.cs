@@ -1,7 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using WindowsOcrWrapper;
+using WindowsOcrWrapper.WinOcrResults;
 
 namespace Ocr.Api.Controllers
 {
@@ -28,9 +34,23 @@ namespace Ocr.Api.Controllers
         }
 
         [HttpPost]
-        public void Post()
+        public async Task<IActionResult> Post()
         {
+            IFormFile[] files = Request.Form.Files.ToArray();
 
+            using MemoryStream memoryStream = new MemoryStream();
+
+            await files[0].CopyToAsync(memoryStream);
+
+            string tempFileName = Path.GetTempFileName();
+            System.IO.File.WriteAllBytes(tempFileName, memoryStream.ToArray());
+
+            OcrExecutor ocrExecutor = new OcrExecutor();
+            OcrResult ocrResult = await ocrExecutor.GetOcrResultAsync(tempFileName);
+
+            System.IO.File.Delete(tempFileName);
+
+            return Ok(ocrResult);
         }
     }
 }

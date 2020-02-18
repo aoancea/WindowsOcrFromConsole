@@ -15,11 +15,13 @@ namespace WinOcrFromConsoleUsingDllInvoke
     /// </summary>
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             //var png = ConfigurationManager.AppSettings["ClocksFolder"] + @"\AAA_BXSP001_060.mxf_clock.png";
             string png = @"E:\projects\WindowsOcrFromConsole\data\1341000-0_UCMR_6000011a1_1562654575151.jpg";
             //RunOcrForAllClocksInParallel();
+
+            await UploadImageInApi();
 
             string baseAddress = "http://localhost:9000/";
 
@@ -64,6 +66,26 @@ namespace WinOcrFromConsoleUsingDllInvoke
             requestContent.Add(imageContent, "image", "image.jpg");
 
             return await client.PostAsync(url, requestContent);
+        }
+
+        private static async Task UploadImageInApi()
+        {
+            string imagePath = @"E:\projects\vdb\data\1341000-0_UCMR_6000011a1_1562654575151.jpg";
+
+            byte[] image = File.ReadAllBytes(imagePath);
+
+            ByteArrayContent imageContent = new ByteArrayContent(image);
+            imageContent.Headers.ContentType = MediaTypeHeaderValue.Parse("image/jpeg");
+
+            MultipartFormDataContent requestContent = new MultipartFormDataContent();
+            requestContent.Add(imageContent, "image", "image.jpg");
+
+            HttpClient client = new HttpClient();
+            HttpResponseMessage ocrResponse = await client.PostAsync("https://localhost:5001/ocr", requestContent);
+
+            Console.WriteLine(ocrResponse);
+            Console.WriteLine(ocrResponse.Content.ReadAsStringAsync().Result);
+            Console.ReadLine();
         }
     }
 }
