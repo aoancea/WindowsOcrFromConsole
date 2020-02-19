@@ -81,7 +81,8 @@ namespace WinOcrFromConsoleUsingDllInvoke
             requestContent.Add(imageContent, "image", "image.jpg");
 
             HttpClient client = new HttpClient();
-            HttpResponseMessage ocrResponse = await client.PostAsync("https://localhost:5001/ocr", requestContent);
+            //HttpResponseMessage ocrResponse = await client.PostAsync("https://localhost:5001/ocr", requestContent);
+            HttpResponseMessage ocrResponse = await client.PostAsync("https://localhost:40546/ocr", requestContent);
 
             Console.WriteLine(ocrResponse);
             Console.WriteLine(ocrResponse.Content.ReadAsStringAsync().Result);
